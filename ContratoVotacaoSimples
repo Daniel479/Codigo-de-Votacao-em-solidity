@@ -1,0 +1,38 @@
+pragma solidity >=0.7.0 <0.9.0;
+
+contract Votacao {
+
+    // Mapeamento para armazenar o número de votos recebidos por cada candidato
+    mapping (string => uint256) public votosRecebidos;
+
+    // Lista de candidatos que participam da votação
+    string[] public listaDeCandidatos;
+
+    // Construtor que inicializa o contrato com a lista de candidatos
+    constructor (string[] memory nomeDosCandidatos) {
+        listaDeCandidatos = nomeDosCandidatos;
+    }
+
+    // Função para obter o total de votos de um candidato específico
+    function totalDeVotos(string memory candidato) view public returns (uint256) {
+        require(valideCandidato(candidato), "Candidato invalido."); // Verifica se o candidato é válido
+        return votosRecebidos[candidato]; // Retorna o número de votos do candidato
+    }
+
+    // Função para votar em um candidato
+    function votoParaCandidato(string memory candidato) public {
+        require(valideCandidato(candidato), "Candidato invalido."); // Verifica se o candidato é válido
+        votosRecebidos[candidato] += 1; // Incrementa o número de votos para o candidato
+    }
+
+    // Função para verificar se um candidato é válido
+    function valideCandidato(string memory candidato) view public returns (bool) {
+        for(uint i = 0; i < listaDeCandidatos.length; i++) {
+            // Compara os nomes dos candidatos utilizando o hash keccak256 para garantir a integridade da comparação
+            if(keccak256(abi.encodePacked(listaDeCandidatos[i])) == keccak256(abi.encodePacked(candidato))) {
+                return true; // Retorna true se o candidato for encontrado na lista
+            }
+        }
+        return false; // Retorna false se o candidato não estiver na lista
+    }
+}
